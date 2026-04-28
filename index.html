@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coaster's Cabs | South Coast Private Cab Service</title>
+  <meta name="description" content="Family-owned private cab service for the South Coast. Safe, reliable and comfortable transport.">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <style>
+    :root{
+      --burgundy:#5b0b14;--dark:#2f050b;--wine:#8a0f1b;--sand:#fbf7ef;--cream:#fff1d7;
+      --gold:#f2b457;--brown:#7b4728;--ink:#261418;--teal:#12656c;--sky:#dff3f0;
+      --soft:rgba(38,20,24,.68);--border:rgba(91,11,20,.13);--line:rgba(18,101,108,.22);
+      --shadow:0 24px 60px rgba(38,20,24,.14)
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--sand);color:var(--ink);font-family:Inter,Arial,sans-serif}
+    a{text-decoration:none;color:inherit}.container{width:min(1180px,calc(100% - 40px));margin:auto}.serif,h1,h2,h3{font-family:Georgia,'Times New Roman',serif}
+    .nav{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(255,249,239,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:20px}.brand{display:flex;align-items:center;gap:12px}.brand img{width:58px;height:58px;border-radius:50%;object-fit:contain}
+    .brand b{font:900 22px Georgia,serif;display:block}.brand span{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brown);font-weight:800}
+    .links{display:flex;gap:26px;font-weight:800;font-size:14px;color:rgba(38,20,24,.72)}.links a:hover{color:var(--burgundy)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:999px;padding:13px 20px;font-weight:900;font-size:14px;border:1px solid transparent;transition:.2s;cursor:pointer;white-space:nowrap}
+    .btn:hover{transform:translateY(-2px)}.primary{background:var(--burgundy);color:white;box-shadow:0 14px 32px rgba(91,11,20,.22)}.primary:hover{background:var(--dark)}
+    .secondary{background:white;color:var(--burgundy);border-color:var(--border)}.secondary:hover{box-shadow:0 12px 28px rgba(91,11,20,.09)}
+    .menu-btn{display:none;background:white;border:0;border-radius:50%;width:44px;height:44px;color:var(--burgundy)}.mobile{display:none;padding-bottom:14px}.mobile a{display:block;background:white;border-radius:18px;padding:14px;margin:8px 0;font-weight:900}
+    .icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+    section{padding:86px 0}.hero{padding-top:132px;position:relative;overflow:hidden;background:linear-gradient(180deg,#fffaf2 0%,var(--sand) 74%)}
+    .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(91,11,20,.07),transparent 46%,rgba(18,101,108,.08));pointer-events:none}
+    .hero-grid{position:relative;display:grid;grid-template-columns:1.12fr .88fr;align-items:center;gap:54px}.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.78);border:1px solid var(--border);padding:9px 15px;border-radius:999px;font-weight:900;font-size:14px;color:var(--burgundy)}
+    h1{font-size:clamp(48px,7vw,82px);line-height:.96;letter-spacing:-.04em;margin:22px 0 0}h2{font-size:clamp(38px,5vw,56px);line-height:1.04;letter-spacing:-.02em;margin:0}h3{margin:0}
+    .lead{font-size:18px;line-height:1.8;color:var(--soft);max-width:700px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:660px;margin-top:30px}.mini,.card{background:white;border:1px solid var(--border);border-radius:26px;padding:18px;box-shadow:0 10px 26px rgba(91,11,20,.05)}
+    .mini b{display:block;margin-top:8px;color:var(--burgundy)}.mini span{font-size:13px;color:var(--soft)}
+    .logo-wrap{position:relative}.logo-wrap:before{content:"";position:absolute;inset:0;transform:rotate(6deg);border-radius:48px;background:var(--burgundy)}.logo-card{position:relative;background:white;border:1px solid var(--border);border-radius:48px;padding:26px;box-shadow:var(--shadow)}
+    .logo-card img{width:min(360px,100%);margin:auto}.lift{margin-top:22px;background:var(--cream);border-radius:30px;padding:20px;display:flex;gap:16px}.icon-box{width:50px;height:50px;display:grid;place-items:center;background:var(--burgundy);color:white;border-radius:18px;flex:0 0 auto}
+    .center{text-align:center;max-width:820px;margin:auto}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.28em;color:var(--brown);font-weight:900;margin:0 0 12px}.white{background:white}
+    .services{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:46px}.service{background:var(--sand);border:1px solid var(--border);border-radius:32px;padding:26px;transition:.2s}.service:hover{transform:translateY(-5px);box-shadow:0 22px 42px rgba(91,11,20,.12)}.service h3{font-size:25px;margin-top:20px}.service p{line-height:1.7;color:var(--soft)}
+    .estimate{background:linear-gradient(140deg,var(--dark),var(--burgundy) 58%,#123f45);color:white;position:relative;overflow:hidden}.estimate .eyebrow{color:var(--gold)}.estimate .lead,.notice p{color:rgba(255,255,255,.78)}
+    .estimate-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:42px;align-items:start}.notice{margin-top:30px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.1);border-radius:22px;padding:20px;display:flex;gap:12px}
+    .estimator{background:var(--sand);color:var(--ink);border-radius:28px;padding:24px;box-shadow:0 30px 70px rgba(0,0,0,.28)}
+    .form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field-wide{grid-column:1/-1}label{display:grid;gap:8px;font-size:13px;font-weight:900;color:var(--burgundy)}select,input{width:100%;border:1px solid var(--border);border-radius:14px;background:white;color:var(--ink);padding:14px;font:inherit;outline:none}input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(18,101,108,.12)}
+    .input-row{display:grid;grid-template-columns:1fr auto;gap:10px}.tool-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.tool-row .btn{padding:11px 15px}.ghost{background:var(--sky);color:#0f4c52;border-color:var(--line)}.ghost:hover{box-shadow:0 12px 24px rgba(18,101,108,.14)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.stat{background:white;border:1px solid var(--border);border-radius:18px;padding:18px}.stat.dark{background:var(--burgundy);color:white}.label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--brown);font-weight:900}.dark .label{color:var(--gold)}.value{display:block;margin-top:9px;font:900 25px Georgia,serif;color:var(--burgundy)}.dark .value{color:white}
+    .route{margin-top:18px;border:1px solid var(--border);background:white;border-radius:22px;overflow:hidden}.route-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;border-bottom:1px solid var(--border);font-weight:900;color:var(--burgundy)}.map-link{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:var(--cream);padding:10px 14px;font-size:13px;font-weight:900}
+    .route-body{display:grid;grid-template-columns:1.15fr .85fr}.map-panel{min-height:410px;position:relative}.map-canvas{height:100%;min-height:410px;background:#dfeee9}.leaflet-container{font:inherit}.leaflet-control-attribution{font-size:10px}.map-helper{position:absolute;left:14px;bottom:14px;right:14px;z-index:400;background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:14px;padding:10px 12px;color:var(--soft);font-size:13px;font-weight:800;box-shadow:0 10px 24px rgba(38,20,24,.12)}
+    .market{padding:18px}.market h3{font-size:23px}.market-row{display:flex;justify-content:space-between;gap:16px;background:var(--sand);border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:10px}.market-row small{display:block;color:var(--soft);margin-top:4px}.price{font:900 20px Georgia,serif;white-space:nowrap;color:var(--burgundy)}
+    .progress-card{margin-top:14px;background:#f7fbfa;border:1px solid var(--line);border-radius:16px;padding:14px}.progress-top{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--burgundy);font-weight:900}.progress-track{height:10px;background:#d8ece9;border-radius:999px;margin:12px 0;overflow:hidden}.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:999px;transition:width .45s ease}.progress-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;color:var(--soft);font-size:12px;font-weight:800}.status-note{margin:12px 0 0;color:var(--soft);font-size:13px;line-height:1.5}
+    .about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:42px}.about-copy p{font-size:17px;line-height:1.85;color:var(--soft);margin:0 0 18px}.about-card img{width:84px;height:84px;border-radius:50%;object-fit:contain}.about-row{display:flex;align-items:center;gap:16px}.checks{display:grid;gap:13px;margin-top:26px;color:var(--soft)}.checks div{display:flex;gap:12px;align-items:center}
+    .contact{display:grid;grid-template-columns:1fr .9fr;overflow:hidden;border-radius:42px;background:var(--burgundy);color:white;box-shadow:var(--shadow)}.contact-main,.contact-side{padding:46px}.contact .eyebrow{color:var(--gold)}.contact p{color:rgba(255,255,255,.78);line-height:1.8;font-size:18px}.booking-form{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:22px}.booking-form label{display:grid;gap:8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.84);font-weight:900}.booking-form input,.booking-form textarea{width:100%;border:1px solid rgba(255,255,255,.34);border-radius:14px;background:rgba(255,255,255,.12);color:white;padding:13px;font:inherit;outline:none}.booking-form textarea{resize:vertical;min-height:102px}.booking-form input::placeholder,.booking-form textarea::placeholder{color:rgba(255,255,255,.66)}.booking-form input:focus,.booking-form textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(242,180,87,.2)}.booking-status{margin-top:12px;border-radius:14px;padding:11px 13px;font-size:14px;font-weight:800;display:none}.booking-status.show{display:block}.booking-status.ok{background:rgba(28,185,129,.2);border:1px solid rgba(28,185,129,.54);color:#c8ffea}.booking-status.error{background:rgba(245,84,104,.2);border:1px solid rgba(245,84,104,.54);color:#ffd8de}.contact-side{background:var(--sand);color:var(--burgundy)}.detail{display:block;background:white;border-radius:26px;padding:18px;margin-top:13px;box-shadow:0 8px 22px rgba(91,11,20,.06)}.detail small{display:block;text-transform:uppercase;letter-spacing:.18em;color:var(--brown);font-weight:900}.detail b{display:block;margin-top:7px;font-size:18px;word-break:break-word}
+    footer{padding:36px 0}.foot{display:flex;align-items:center;justify-content:space-between;gap:18px;border-top:1px solid var(--border);padding-top:26px}.foot img{width:52px;height:52px;border-radius:50%;object-fit:contain}.foot-brand{display:flex;align-items:center;gap:12px}.foot b{display:block;font:900 22px Georgia,serif}.foot span,.foot p{font-size:14px;color:rgba(91,11,20,.62);margin:0}.float{position:fixed;right:22px;bottom:22px;z-index:20}
+    @media(max-width:960px){.links,.desktop-book{display:none}.menu-btn{display:grid;place-items:center}.mobile.open{display:block}.hero-grid,.estimate-grid,.about-grid,.contact{grid-template-columns:1fr}.services{grid-template-columns:repeat(2,1fr)}.route-body{grid-template-columns:1fr}.map-panel,.map-canvas{min-height:360px}}
+    @media(max-width:640px){.container{width:calc(100% - 28px)}section{padding:68px 0}.hero{padding-top:116px}.features,.services,.form,.stats,.progress-meta,.booking-form{grid-template-columns:1fr}.input-row{grid-template-columns:1fr}.contact-main,.contact-side{padding:30px}.foot{flex-direction:column;align-items:flex-start}.float{left:16px;right:16px}.float .btn{width:100%}.route-head{align-items:flex-start;flex-direction:column}.route-head .map-link{width:100%;justify-content:center}.value{font-size:23px}}
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <symbol id="phone" viewBox="0 0 24 24"><path class="icon" d="M22 16.92v3a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3.09 5.18 2 2 0 0 1 5.08 3h3a2 2 0 0 1 2 1.72c.12.9.32 1.78.6 2.62a2 2 0 0 1-.45 2.11L9 10.7a16 16 0 0 0 4.3 4.3l1.25-1.23a2 2 0 0 1 2.11-.45c.84.28 1.72.48 2.62.6A2 2 0 0 1 22 16.92Z"/></symbol>
+    <symbol id="mail" viewBox="0 0 24 24"><path class="icon" d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm18 3-10 6L2 7"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path class="icon" d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></symbol>
+    <symbol id="waves" viewBox="0 0 24 24"><path class="icon" d="M2 16c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 20c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></symbol>
+    <symbol id="car" viewBox="0 0 24 24"><path class="icon" d="M5 17h14l-1.5-5.5A3 3 0 0 0 14.6 9H9.4a3 3 0 0 0-2.9 2.5L5 17ZM7 17v2M17 17v2M6 13h12M7.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM16.5 21a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></symbol>
+    <symbol id="shield" viewBox="0 0 24 24"><path class="icon" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10ZM9 12l2 2 4-5"/></symbol>
+    <symbol id="clock" viewBox="0 0 24 24"><path class="icon" d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM12 6v6l4 2"/></symbol>
+    <symbol id="palm" viewBox="0 0 24 24"><path class="icon" d="M12 22V11M12 11c-3-3-6-3-9-1 4-5 8-5 9 1Zm0 0c3-4 7-5 10-2-4 0-7 1-10 2Zm0 0C9 7 7 4 6 2c4 1 6 4 6 9Zm0 0c1-5 4-8 8-9-1 4-3 7-8 9Z"/></symbol>
+    <symbol id="map" viewBox="0 0 24 24"><path class="icon" d="M21 10c0 7-9 12-9 12S3 17 3 10a9 9 0 1 1 18 0ZM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></symbol>
+    <symbol id="nav" viewBox="0 0 24 24"><path class="icon" d="M3 11 22 2l-9 19-2-8-8-2Z"/></symbol>
+    <symbol id="calc" viewBox="0 0 24 24"><path class="icon" d="M4 2h16v20H4zM8 6h8M8 11h2M12 11h2M16 11h.01M8 15h2M12 15h2M16 15h.01M8 19h2M12 19h6"/></symbol>
+    <symbol id="check" viewBox="0 0 24 24"><path class="icon" d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="menu" viewBox="0 0 24 24"><path class="icon" d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  </svg>
+
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#home"><img src="assets/coasters-cabs-logo.png" alt="Coaster's Cabs logo"><div><b>Coaster's Cabs</b><span>South Coast rides</span></div></a>
+      <div class="links"><a href="#home">Home</a><a href="#services">Services</a><a href="#estimate">Estimate</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+      <div class="desktop-book"><a class="btn primary" href="https://wa.me/27785434457?text=Hi%20Coaster's%20Cabs%2C%20I%20would%20like%20to%20book%20a%20ride."><svg class="icon"><use href="#chat"/></svg> Book now</a></div>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu"><svg class="icon"><use href="#menu"/></svg></button>
+    </div>
+    <div class="container mobile" id="mobileMenu"><a href="#home">Home</a><a href="#services">Services</a><a href="#estimate">Estimate</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+  </nav>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="pill"><svg class="icon"><use href="#waves"/></svg> Family owned rides for the South Coast</div>
+          <h1>Coastal rides with heart, comfort and reliable wheels.</h1>
+          <p class="lead">When the usual one click options are out of reach, Coaster's Cabs keeps the South Coast moving with safe, friendly and dependable private transport.</p>
+          <div class="actions">
+            <a class="btn primary" href="tel:+27785434457"><svg class="icon"><use href="#phone"/></svg> Call Bux</a>
+            <a class="btn secondary" href="https://wa.me/27785434457?text=Hi%20Bux%2C%20I%20would%20like%20to%20book%20a%20Coaster's%20Cabs%20ride."><svg class="icon"><use href="#chat"/></svg> WhatsApp</a>
+            <a class="btn secondary" href="mailto:buxmdunjana23@gmail.com?subject=Ride%20booking%20request%20for%20Coaster's%20Cabs"><svg class="icon"><use href="#mail"/></svg> Email</a>
+          </div>
+          <div class="features">
+            <div class="mini"><svg class="icon"><use href="#shield"/></svg><b>Safe</b><span>Respectful rides</span></div>
+            <div class="mini"><svg class="icon"><use href="#clock"/></svg><b>Reliable</b><span>On time focus</span></div>
+            <div class="mini"><svg class="icon"><use href="#palm"/></svg><b>Local</b><span>South Coast care</span></div>
+          </div>
+        </div>
+        <div class="logo-wrap"><div class="logo-card"><img src="assets/coasters-cabs-logo.png" alt="Coaster's Cabs coastal taxi logo"><div class="lift"><div class="icon-box"><svg class="icon"><use href="#car"/></svg></div><div><h3>Need a lift?</h3><p>Airport runs, beach pickups, errands, work trips and safe rides home.</p></div></div></div></div>
+      </div>
+    </section>
+
+    <section id="services" class="white">
+      <div class="container">
+        <div class="center"><p class="eyebrow">What we do</p><h2>Transport that feels easy as a sea breeze.</h2></div>
+        <div class="services">
+          <article class="service"><div class="icon-box"><svg class="icon"><use href="#car"/></svg></div><h3>Private cab rides</h3><p>Point to point transport for locals, visitors, families, students and workers across the South Coast.</p></article>
+          <article class="service"><div class="icon-box"><svg class="icon"><use href="#clock"/></svg></div><h3>Airport and early runs</h3><p>Reliable pickups for early mornings, long trips, luggage, appointments and travel days.</p></article>
+          <article class="service"><div class="icon-box"><svg class="icon"><use href="#shield"/></svg></div><h3>Safe rides home</h3><p>Calm, respectful transport after dinners, events, late shifts and nights out.</p></article>
+          <article class="service"><div class="icon-box"><svg class="icon"><use href="#waves"/></svg></div><h3>Beach day pickups</h3><p>Sandy feet, sun hats and shopping bags are welcome. We make the ride back easy.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="estimate" class="estimate">
+      <div class="container estimate-grid">
+        <div>
+          <p class="eyebrow">Dynamic fare guide</p><h2>Plan the trip before you ride.</h2>
+          <p class="lead">Enter the exact pickup and drop off points, or drag the pins on the map. The route, time, fare estimate and trip progress update in one place.</p>
+          <div class="notice"><svg class="icon"><use href="#calc"/></svg><p>The map uses public map services and a practical South Coast pricing model. Final pricing can still change for traffic, waiting time, luggage, late night travel and route conditions.</p></div>
+        </div>
+        <div class="estimator">
+          <div class="form">
+            <label class="field-wide">Pick up
+              <div class="input-row"><input id="pickupInput" autocomplete="street-address" placeholder="Type pickup address or place"><button class="btn ghost" id="pickupSearch" type="button">Find</button></div>
+            </label>
+            <label class="field-wide">Drop off
+              <div class="input-row"><input id="dropoffInput" autocomplete="street-address" placeholder="Type drop off address or place"><button class="btn ghost" id="dropoffSearch" type="button">Find</button></div>
+            </label>
+            <label>Ride type<select id="rideType"></select></label>
+            <label>Passengers<input id="passengers" type="number" min="1" max="7" value="1"></label>
+          </div>
+          <div class="tool-row">
+            <button class="btn ghost" id="useLocation" type="button"><svg class="icon"><use href="#nav"/></svg> Use my location</button>
+            <button class="btn secondary" id="swapRoute" type="button">Swap route</button>
+            <button class="btn primary" id="startTrip" type="button">Start trip progress</button>
+          </div>
+          <div class="stats">
+            <div class="stat"><span class="label">Distance</span><span class="value" id="distanceOut">0 km</span></div>
+            <div class="stat"><span class="label">Time</span><span class="value" id="timeOut">0 min</span></div>
+            <div class="stat dark"><span class="label">Guide price</span><span class="value" id="priceOut">R0</span></div>
+          </div>
+          <div class="route">
+            <div class="route-head"><span><svg class="icon"><use href="#map"/></svg> Route preview</span><a class="map-link" id="mapLink" target="_blank" rel="noreferrer">Open route <svg class="icon"><use href="#nav"/></svg></a></div>
+            <div class="route-body">
+              <div class="map-panel"><div class="map-canvas" id="mapCanvas"></div><div class="map-helper" id="mapHelper">Click the map to move the drop off pin. Drag either pin for a more exact route.</div></div>
+              <div class="market">
+                <h3>Your trip</h3>
+                <div id="marketRows"></div>
+                <div class="progress-card">
+                  <div class="progress-top"><span id="progressStatus">Route ready</span><span id="progressPercent">0%</span></div>
+                  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                  <div class="progress-meta"><span id="etaOut">ETA: --</span><span id="remainingOut">Remaining: --</span><span id="stageOut">Stage: planning</span></div>
+                  <p class="status-note" id="routeNote">Search addresses, use your location, or adjust the markers to generate a more accurate estimate.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="actions"><a class="btn primary" id="quoteWhatsApp"><svg class="icon"><use href="#chat"/></svg> Send quote on WhatsApp</a><a class="btn secondary" href="tel:+27785434457"><svg class="icon"><use href="#phone"/></svg> Call to confirm</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="container about-grid">
+        <div><p class="eyebrow">About us</p><h2>Built by family. Made for the coast.</h2>
+          <div class="card about-card" style="margin-top:30px"><div class="about-row"><img src="assets/coasters-cabs-logo.png" alt="Coaster's Cabs logo"><div><h3>Coaster's Cabs</h3><p style="color:var(--soft)">Safe, reliable, comfortable transport</p></div></div>
+            <div class="checks"><div><svg class="icon"><use href="#check"/></svg> Safe and respectful drivers</div><div><svg class="icon"><use href="#check"/></svg> Family owned customer care</div><div><svg class="icon"><use href="#check"/></svg> Reliable local knowledge</div><div><svg class="icon"><use href="#check"/></svg> Comfortable rides for everyday trips</div></div>
+          </div>
+        </div>
+        <div class="card about-copy">
+          <p>Born on the South Coast and built by family, our private cab service was created for those moments when you need a lift, but the usual one click options simply are not available.</p>
+          <p>We are here for the early morning airport runs, the sandy feet after a beach day, the quick trip into town, the safe ride home after dinner, the school run, the shopping mission, the work commute, and every little journey in between. Around here, transport should feel as easy as a sea breeze, not like a struggle.</p>
+          <p>As a family owned business, we bring a personal touch to every ride. We believe our customers should feel more than just picked up and dropped off. They should feel welcomed, looked after, and completely at ease. Whether you are a local, a holidaymaker, a worker, a student, or someone just trying to get from one coastal stop to the next, we are here to make the trip simple, safe, and comfortable.</p>
+          <p>Safety is at the heart of what we do. Our service is reliable, respectful, and built on trust. We want every customer to feel calm from the moment they book to the moment they arrive. No stress, no uncertainty, no feeling stranded.</p>
+          <p>Our cab service was created to fill a real gap along the South Coast, especially in places where transport can be hard to find. We offer a dependable private transport option for the communities, visitors, and families who need someone they can count on.</p>
+          <p>With a splash of coastal charm, a whole lot of care, and a commitment to honest service, we are proud to help people move around the South Coast safely and comfortably. We are not just a cab service. We are a local family business with big heart, reliable wheels, and a love for keeping our coast connected.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="white">
+      <div class="container contact">
+        <div class="contact-main"><p class="eyebrow">Book your ride</p><h2>Ready when the road calls.</h2><p>Send your pickup point, drop off point, preferred time and number of passengers. Bux will confirm availability and pricing.</p>
+          <form id="bookingForm" class="booking-form">
+            <label>Full name<input id="bookingName" name="name" placeholder="Your full name" required></label>
+            <label>Phone number<input id="bookingPhone" name="phone" placeholder="07X XXX XXXX" required></label>
+            <label>Pickup<input id="bookingPickup" name="pickup" placeholder="Pickup location" required></label>
+            <label>Drop off<input id="bookingDropoff" name="dropoff" placeholder="Drop off location" required></label>
+            <label>Preferred date and time<input id="bookingDatetime" name="datetime" type="datetime-local" required></label>
+            <label>Passengers<input id="bookingPassengers" name="passengers" type="number" min="1" max="7" value="1" required></label>
+            <label class="field-wide">Extra notes<textarea id="bookingNotes" name="notes" placeholder="Gate code, luggage, return trip, or any other details"></textarea></label>
+            <label>Ride type<input id="bookingRideType" name="rideType" readonly></label>
+            <label>Guide fare<input id="bookingFareText" name="fareText" readonly></label>
+            <button id="bookingSubmit" class="btn primary field-wide" type="submit"><svg class="icon"><use href="#check"/></svg> Submit booking request</button>
+          </form>
+          <div id="bookingStatus" class="booking-status" role="status" aria-live="polite"></div>
+          <div class="actions"><a class="btn secondary" href="https://wa.me/27785434457?text=Hi%20Bux%2C%20I%20would%20like%20to%20book%20a%20Coaster's%20Cabs%20ride.%20Pickup%3A%20%20Drop%20off%3A%20%20Time%3A%20"><svg class="icon"><use href="#chat"/></svg> WhatsApp</a><a class="btn secondary" href="tel:+27785434457"><svg class="icon"><use href="#phone"/></svg> Call 078 5 434 457</a><a class="btn secondary" href="mailto:buxmdunjana23@gmail.com?subject=Coaster's%20Cabs%20booking%20request&body=Hi%20Bux%2C%0A%0AI%20would%20like%20to%20book%20a%20ride.%0A%0APickup%3A%0ADrop%20off%3A%0ADate%20and%20time%3A%0APassengers%3A%0A%0AThank%20you."><svg class="icon"><use href="#mail"/></svg> Email</a></div>
+        </div>
+        <div class="contact-side"><h3>Contact details</h3><a class="detail" href="tel:+27785434457"><small>Primary phone</small><b>078 5 434 457</b></a><a class="detail" href="tel:+27724204082"><small>Second phone</small><b>072 4 204 082</b></a><a class="detail" href="mailto:buxmdunjana23@gmail.com"><small>Email</small><b>buxmdunjana23@gmail.com</b></a><div class="detail"><small>Postal address</small><b>PO Box 172, Izotsha 4242</b></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container foot"><div class="foot-brand"><img src="assets/coasters-cabs-logo.png" alt="Coaster's Cabs"><div><b>Coaster's Cabs</b><span>Keeping the South Coast connected.</span></div></div><p>© <span id="year"></span> Coaster's Cabs. Family owned private cab service.</p></div></footer>
+  <div class="float"><a class="btn primary" href="https://wa.me/27785434457?text=Hi%20Coaster's%20Cabs%2C%20I%20need%20a%20ride."><svg class="icon"><use href="#chat"/></svg> WhatsApp ride</a></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script>
+    const API_BASE="";
+    const profiles={local:{label:"Local cab",base:35,perKm:15,min:70,factor:1},airport:{label:"Airport or long trip",base:80,perKm:13,min:180,factor:1.08},comfort:{label:"Comfort ride",base:55,perKm:17,min:95,factor:1.18}};
+    const markets=[{name:"Coaster's Cabs",multiplier:1,note:"Direct family service"},{name:"Ride app style range",multiplier:1.15,note:"Comparable market guide"},{name:"Peak or late night",multiplier:1.35,note:"Busy periods and extra demand"}];
+    const $=id=>document.getElementById(id), money=v=>new Intl.NumberFormat("en-ZA",{style:"currency",currency:"ZAR",maximumFractionDigits:0}).format(v);
+    const start={lat:-30.7414,lng:30.4548,label:"Port Shepstone"}, end={lat:-30.8636,lng:30.3705,label:"Margate"};
+    let pickup={...start}, dropoff={...end}, routeLine, routeKm=0, routeMin=0, progressTimer;
+    const bookingForm=$("bookingForm"), bookingStatus=$("bookingStatus"), bookingSubmit=$("bookingSubmit");
+
+    Object.entries(profiles).forEach(([k,p])=>rideType.add(new Option(p.label,k)));
+    pickupInput.value=pickup.label; dropoffInput.value=dropoff.label;
+
+    const map=L.map("mapCanvas",{scrollWheelZoom:false}).setView([-30.82,30.39],10);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(map);
+    const pinIcon=color=>L.divIcon({className:"",html:`<span style="display:block;width:20px;height:20px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 8px 20px rgba(0,0,0,.28)"></span>`,iconSize:[20,20],iconAnchor:[10,10]});
+    const pickupMarker=L.marker([pickup.lat,pickup.lng],{draggable:true,icon:pinIcon("#5b0b14")}).addTo(map).bindPopup("Pickup");
+    const dropoffMarker=L.marker([dropoff.lat,dropoff.lng],{draggable:true,icon:pinIcon("#12656c")}).addTo(map).bindPopup("Drop off");
+
+    function km(a,b){const R=6371,rad=d=>d*Math.PI/180,dLat=rad(b.lat-a.lat),dLng=rad(b.lng-a.lng),lat1=rad(a.lat),lat2=rad(b.lat);const h=Math.sin(dLat/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+    function fare(distance,key){const p=profiles[key],time=Math.max(12,distance*2.15+7),cost=Math.max(p.min,p.base+distance*p.perKm+time*1.4)*p.factor;return{time,cost}}
+    function setProgress(percent,status,stage){progressFill.style.width=percent+"%";progressPercent.textContent=percent+"%";progressStatus.textContent=status;stageOut.textContent="Stage: "+stage;remainingOut.textContent="Remaining: "+Math.max(0,Math.round(routeMin*(1-percent/100)))+" min"}
+    function routeUrl(){return `https://www.google.com/maps/dir/?api=1&origin=${pickup.lat},${pickup.lng}&destination=${dropoff.lat},${dropoff.lng}`}
+    function syncMarkers(){pickupMarker.setLatLng([pickup.lat,pickup.lng]);dropoffMarker.setLatLng([dropoff.lat,dropoff.lng])}
+    function setBookingStatus(message,type){bookingStatus.className=`booking-status show ${type}`;bookingStatus.textContent=message}
+    function syncBookingForm(){if(!bookingForm) return;bookingPickup.value=pickupInput.value.trim();bookingDropoff.value=dropoffInput.value.trim();bookingPassengers.value=passengers.value;bookingRideType.value=rideType.options[rideType.selectedIndex]?.text || "";bookingFareText.value=priceOut.textContent}
+
+    async function drawRoute(){
+      clearInterval(progressTimer); setProgress(0,"Calculating route","planning");
+      mapHelper.textContent="Calculating the best available route...";
+      const url=`${API_BASE}/api/route?pickupLat=${pickup.lat}&pickupLng=${pickup.lng}&dropoffLat=${dropoff.lat}&dropoffLng=${dropoff.lng}`;
+      try{
+        const res=await fetch(url); if(!res.ok) throw new Error("Route service unavailable");
+        const data=await res.json();
+        const coords=data.geometry.coordinates.map(([lng,lat])=>[lat,lng]);
+        routeKm=data.distanceMeters/1000; routeMin=data.durationSeconds/60;
+        if(routeLine) routeLine.remove();
+        routeLine=L.polyline(coords,{color:"#12656c",weight:5,opacity:.85}).addTo(map);
+        map.fitBounds(routeLine.getBounds(),{padding:[28,28]});
+        mapHelper.textContent="Route calculated. Drag the pins or search a new address to update the trip.";
+      }catch(e){
+        routeKm=km(pickup,dropoff)*1.28; routeMin=Math.max(12,routeKm*2.15+7);
+        if(routeLine) routeLine.remove();
+        routeLine=L.polyline([[pickup.lat,pickup.lng],[dropoff.lat,dropoff.lng]],{color:"#12656c",weight:5,dashArray:"9 10",opacity:.8}).addTo(map);
+        map.fitBounds(routeLine.getBounds(),{padding:[28,28]});
+        mapHelper.textContent="Live routing is unavailable, so the estimate is using a practical distance guide.";
+      }
+      updateEstimate();
+    }
+
+    function updateEstimate(){
+      const extraPassengers=Math.max(0,(Number(passengers.value)||1)-4), r=fare(routeKm,rideType.value), passengerFee=extraPassengers*25, low=(r.cost+passengerFee)*.92, high=(r.cost+passengerFee)*1.18;
+      distanceOut.textContent=routeKm.toFixed(1)+" km";
+      timeOut.textContent=Math.round(routeMin)+" min";
+      priceOut.textContent=money(low)+" to "+money(high);
+      etaOut.textContent="ETA: "+Math.round(routeMin)+" min";
+      mapLink.href=routeUrl();
+      marketRows.innerHTML=markets.map(m=>`<div class="market-row"><div><b>${m.name}</b><small>${m.note}</small></div><span class="price">${money((r.cost+passengerFee)*m.multiplier)}</span></div>`).join("");
+      routeNote.textContent=`Pickup: ${pickupInput.value || "selected on map"}. Drop off: ${dropoffInput.value || "selected on map"}.`;
+      quoteWhatsApp.href="https://wa.me/27785434457?text="+encodeURIComponent(`Hi Bux, I would like a Coaster's Cabs quote. Pickup: ${pickupInput.value}. Drop off: ${dropoffInput.value}. Estimated distance: ${routeKm.toFixed(1)} km. Estimated fare shown: ${money(low)} to ${money(high)}.`);
+      setProgress(0,"Route ready","planning");
+      syncBookingForm();
+    }
+
+    async function geocode(input,kind){
+      const value=input.value.trim(); if(!value) return;
+      mapHelper.textContent="Finding "+kind+"...";
+      const url=`${API_BASE}/api/geocode?q=${encodeURIComponent(value)}`;
+      try{
+        const res=await fetch(url); if(!res.ok) throw new Error("Address not found");
+        const place=await res.json();
+        const point={lat:Number(place.lat),lng:Number(place.lng),label:value};
+        if(kind==="pickup") pickup=point; else dropoff=point;
+        syncMarkers(); drawRoute();
+      }catch(e){mapHelper.textContent="That address could not be found. Try adding the town or drag the marker on the map."}
+    }
+
+    pickupSearch.onclick=()=>geocode(pickupInput,"pickup");
+    dropoffSearch.onclick=()=>geocode(dropoffInput,"dropoff");
+    pickupInput.addEventListener("keydown",e=>{if(e.key==="Enter") geocode(pickupInput,"pickup")});
+    dropoffInput.addEventListener("keydown",e=>{if(e.key==="Enter") geocode(dropoffInput,"dropoff")});
+    rideType.addEventListener("input",updateEstimate);
+    passengers.addEventListener("input",updateEstimate);
+    pickupMarker.on("dragend",e=>{const p=e.target.getLatLng();pickup={lat:p.lat,lng:p.lng,label:"Pinned pickup"};pickupInput.value="Pinned pickup";drawRoute()});
+    dropoffMarker.on("dragend",e=>{const p=e.target.getLatLng();dropoff={lat:p.lat,lng:p.lng,label:"Pinned drop off"};dropoffInput.value="Pinned drop off";drawRoute()});
+    map.on("click",e=>{dropoff={lat:e.latlng.lat,lng:e.latlng.lng,label:"Pinned drop off"};dropoffInput.value="Pinned drop off";syncMarkers();drawRoute()});
+    useLocation.onclick=()=>navigator.geolocation?navigator.geolocation.getCurrentPosition(pos=>{pickup={lat:pos.coords.latitude,lng:pos.coords.longitude,label:"My current location"};pickupInput.value="My current location";syncMarkers();drawRoute()},()=>mapHelper.textContent="Location permission was not granted. You can still type your pickup address or drag the pin."):mapHelper.textContent="This browser does not support location access.";
+    swapRoute.onclick=()=>{[pickup,dropoff]=[dropoff,pickup];[pickupInput.value,dropoffInput.value]=[dropoffInput.value,pickupInput.value];syncMarkers();drawRoute()};
+    startTrip.onclick=()=>{clearInterval(progressTimer);let p=0;setProgress(0,"Driver en route","pickup");progressTimer=setInterval(()=>{p=Math.min(100,p+5);const status=p<35?"Driver en route":p<70?"Passenger on board":p<100?"Approaching drop off":"Trip complete";const stage=p<35?"pickup":p<100?"in progress":"complete";setProgress(p,status,stage);if(p===100) clearInterval(progressTimer)},650)};
+    bookingForm?.addEventListener("submit",async e=>{
+      e.preventDefault();
+      setBookingStatus("Submitting booking request...","ok");
+      bookingSubmit.disabled=true;
+      const payload={
+        name:bookingName.value.trim(),
+        phone:bookingPhone.value.trim(),
+        pickup:bookingPickup.value.trim(),
+        dropoff:bookingDropoff.value.trim(),
+        datetime:bookingDatetime.value,
+        passengers:Number(bookingPassengers.value),
+        notes:bookingNotes.value.trim(),
+        rideType:rideType.value,
+        distanceKm:Number(routeKm.toFixed(1)),
+        durationMinutes:Math.round(routeMin),
+        fareText:bookingFareText.value
+      };
+      try{
+        const res=await fetch(`${API_BASE}/api/bookings`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+        const result=await res.json();
+        if(!res.ok) throw new Error(result.error || "Booking request failed");
+        setBookingStatus(`Booking submitted successfully. Reference: ${result.bookingId.slice(0,8)}.`,`ok`);
+        bookingName.value=""; bookingPhone.value=""; bookingNotes.value="";
+      }catch(err){
+        setBookingStatus(err.message || "Could not submit booking.","error");
+      }finally{bookingSubmit.disabled=false}
+    });
+
+    drawRoute();
+    syncBookingForm();
+    year.textContent=new Date().getFullYear();
+    menuBtn.onclick=()=>mobileMenu.classList.toggle("open");
+    mobileMenu.querySelectorAll("a").forEach(a=>a.onclick=()=>mobileMenu.classList.remove("open"));
+  </script>
+</body>
+</html>
